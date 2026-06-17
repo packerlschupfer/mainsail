@@ -20,7 +20,9 @@ export default function buildReleaseInfo(): PluginOption {
                 await releaseInfoFile.writeFile(
                     JSON.stringify({
                         project_name: 'mainsail',
-                        project_owner: 'mainsail-crew',
+                        // fork build: Moonraker's web updater treats project_owner as authoritative
+                        // and overrides the configured `repo:`, so this MUST be the fork owner.
+                        project_owner: 'packerlschupfer',
                         version: `v${versionIdentifier}`,
                     })
                 )
