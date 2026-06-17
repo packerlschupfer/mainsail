@@ -10,6 +10,7 @@ import {
     mdiEngine,
     mdiGamepad,
     mdiInformation,
+    mdiLayersTriple,
     mdiLedStrip,
     mdiPrinter3dNozzle,
     mdiThermometerLines,
@@ -59,6 +60,8 @@ export default class DashboardMixin extends BaseMixin {
                 return mdiArrowCollapseVertical
             case 'toolhead-control':
                 return mdiGamepad
+            case 'build-sheet':
+                return mdiLayersTriple
             case 'macros':
                 return mdiCodeTags
             case 'miscellaneous':

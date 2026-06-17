@@ -682,6 +682,12 @@
             "WeightSubtitle": "The weight of the filament in grams (without spool).",
             "WeightUsed": "{weight}g used"
         },
+        "BuildSheetPanel": {
+            "Active": "Active",
+            "Headline": "Build Sheet",
+            "Offset": "Offset",
+            "SaveZ": "Save Z to sheet"
+        },
         "ExtruderControlPanel": {
             "Allowed": "Allowed",
             "CleanNozzle": "Clean Nozzle",
