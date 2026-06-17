@@ -42,6 +42,18 @@
                 <span class="d-none d-md-inline">{{ $t('App.TopBar.UploadPrint') }}</span>
             </v-btn>
             <v-btn
+                v-if="showSoftAbortButton"
+                tile
+                :icon="$vuetify.breakpoint.smAndDown"
+                :text="$vuetify.breakpoint.mdAndUp"
+                color="warning"
+                class="button-min-width-auto px-3 soft-abort-button"
+                :loading="loadings.includes('topbarSoftAbort')"
+                @click="softAbort">
+                <v-icon class="mr-md-2">{{ mdiStopCircleOutline }}</v-icon>
+                <span class="d-none d-md-inline">{{ $t('App.TopBar.SoftAbort') }}</span>
+            </v-btn>
+            <v-btn
                 v-if="klippyIsConnected"
                 tile
                 :icon="$vuetify.breakpoint.smAndDown"
@@ -87,7 +99,14 @@ import PrinterSelector from '@/components/ui/PrinterSelector.vue'
 import MainsailLogo from '@/components/ui/MainsailLogo.vue'
 import TheNotificationMenu from '@/components/notifications/TheNotificationMenu.vue'
 import { topbarHeight } from '@/store/variables'
-import { mdiAlertOctagonOutline, mdiContentSave, mdiFileUpload, mdiClose, mdiCloseThick } from '@mdi/js'
+import {
+    mdiAlertOctagonOutline,
+    mdiContentSave,
+    mdiFileUpload,
+    mdiClose,
+    mdiCloseThick,
+    mdiStopCircleOutline,
+} from '@mdi/js'
 import EmergencyStopDialog from '@/components/dialogs/EmergencyStopDialog.vue'
 import InlineSvg from 'vue-inline-svg'
 import ThemeMixin from '@/components/mixins/theme'
@@ -119,6 +138,7 @@ export default class TheTopbar extends Mixins(BaseMixin, ThemeMixin) {
     mdiFileUpload = mdiFileUpload
     mdiClose = mdiClose
     mdiCloseThick = mdiCloseThick
+    mdiStopCircleOutline = mdiStopCircleOutline
 
     topbarHeight = topbarHeight
 
@@ -208,6 +228,13 @@ export default class TheTopbar extends Mixins(BaseMixin, ThemeMixin) {
         )
     }
 
+    get showSoftAbortButton() {
+        // mirror Emergency Stop visibility: always available while klippy is connected.
+        // a blocking heat/soak/mesh wait (the thing this interrupts) can occur in standby too
+        // (e.g. a manual M190 from the console), so it must not be gated to printing/paused.
+        return this.klippyIsConnected
+    }
+
     get defaultNavigationStateSetting() {
         return this.$store.state.gui?.uiSettings?.defaultNavigationStateSetting ?? 'alwaysOpen'
     }
@@ -241,6 +268,13 @@ export default class TheTopbar extends Mixins(BaseMixin, ThemeMixin) {
     emergencyStop() {
         this.showEmergencyStopDialog = false
         this.$socket.emit('printer.emergency_stop', {}, { loading: 'topbarEmergencyStop' })
+    }
+
+    softAbort() {
+        // out-of-band graceful abort: interrupts blocking heat/soak/mesh waits and parks to idle.
+        // must NOT be a gcode macro (would queue behind the same wait it is meant to interrupt).
+        this.$store.dispatch('server/addEvent', { message: 'machine.soft_abort', type: 'command' })
+        this.$socket.emit('machine.soft_abort', {}, { loading: 'topbarSoftAbort' })
     }
 
     saveConfig() {

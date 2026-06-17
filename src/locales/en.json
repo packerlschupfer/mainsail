@@ -85,6 +85,7 @@
             "CannotUploadTheFile": "Cannot upload the file!",
             "EmergencyStop": "Emergency Stop",
             "SAVE_CONFIG": "SAVE CONFIG",
+            "SoftAbort": "Soft Abort",
             "Uploading": "Uploading",
             "UploadOfFileSuccessful": "Upload of {file} successful!",
             "UploadPrint": "Upload & Print"
