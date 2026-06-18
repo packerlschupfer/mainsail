@@ -102,6 +102,15 @@ export const getters: GetterTree<GuiState, RootState> = {
             allPanels = allPanels.filter((name) => name !== 'build-sheet')
         }
 
+        // remove fans panel, if no fan object exists in Klipper
+        const fanTypes = ['fan_generic', 'heater_fan', 'controller_fan', 'temperature_fan']
+        const existsFan = Object.keys(rootState.printer ?? {}).some(
+            (name) => name === 'fan' || fanTypes.includes(name.split(' ')[0])
+        )
+        if (!existsFan) {
+            allPanels = allPanels.filter((name) => name !== 'fans')
+        }
+
         // remove led_effects panel, if no led_effect object exists in Klipper
         const ledEffectsPrefix = 'led_effect '
         const existsLedEffects = Object.keys(rootState.printer ?? {}).some((name) =>

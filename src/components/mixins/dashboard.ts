@@ -8,6 +8,7 @@ import {
     mdiConsoleLine,
     mdiDipSwitch,
     mdiEngine,
+    mdiFan,
     mdiGamepad,
     mdiInformation,
     mdiLayersTriple,
@@ -62,6 +63,8 @@ export default class DashboardMixin extends BaseMixin {
                 return mdiGamepad
             case 'build-sheet':
                 return mdiLayersTriple
+            case 'fans':
+                return mdiFan
             case 'macros':
                 return mdiCodeTags
             case 'miscellaneous':

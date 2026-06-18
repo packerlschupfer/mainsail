@@ -721,6 +721,11 @@
             "Tools": "Tools",
             "UnloadFilament": "Unload Filament"
         },
+        "FansPanel": {
+            "Headline": "Fans",
+            "MaxCap": "Max cap",
+            "MinCap": "Min cap"
+        },
         "FarmPrinterPanel": {
             "ReconnectToPrinter": "Reconnect",
             "SwitchToPrinter": "Switch to Printer",

@@ -85,6 +85,7 @@ import { Mixins } from 'vue-property-decorator'
 import AfcPanel from '@/components/panels/AfcPanel.vue'
 import BuildSheetPanel from '@/components/panels/BuildSheetPanel.vue'
 import ExtruderControlPanel from '@/components/panels/ExtruderControlPanel.vue'
+import FansPanel from '@/components/panels/FansPanel.vue'
 import DashboardMixin from '@/components/mixins/dashboard'
 import KlippyStatePanel from '@/components/panels/KlippyStatePanel.vue'
 import LedEffectsPanel from '@/components/panels/LedEffectsPanel.vue'
@@ -106,6 +107,7 @@ import WebcamPanel from '@/components/panels/WebcamPanel.vue'
         AfcPanel,
         BuildSheetPanel,
         ExtruderControlPanel,
+        FansPanel,
         KlippyStatePanel,
         LedEffectsPanel,
         MachineSettingsPanel,
