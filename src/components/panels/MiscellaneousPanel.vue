@@ -80,7 +80,11 @@ export default class MiscellaneousPanel extends Mixins(BaseMixin, MiscellaneousM
     }
 
     get miscellaneous() {
-        return this.$store.getters['printer/getMiscellaneous'] ?? []
+        // fans now live in the dedicated Fans panel — drop them here to avoid duplication
+        const fanTypes = ['fan', 'fan_generic', 'heater_fan', 'controller_fan']
+        return (this.$store.getters['printer/getMiscellaneous'] ?? []).filter(
+            (o: { type: string }) => !fanTypes.includes(o.type)
+        )
     }
 
     get miscellaneousSensors() {
