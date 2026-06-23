@@ -6,7 +6,7 @@ maintainable.
 
 - **upstream:** `mainsail-crew/mainsail` (base branch `develop`)
 - **origin:** `packerlschupfer/mainsail`
-- **working branch:** `feat/soft-abort` (misnomer now — it's the whole Core One fork; consider renaming `coreone`)
+- **working branch:** `core-one`
 
 ## What this fork adds / changes (vs upstream)
 
