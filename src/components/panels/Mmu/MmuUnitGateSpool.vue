@@ -8,8 +8,7 @@
                 :width="spoolWidth"
                 v-bind="attrs"
                 :class="svgClasses"
-                v-on="on"
-                @click="selectGate">
+                v-on="on">
                 <defs>
                     <path
                         id="oval"
@@ -62,7 +61,7 @@
                     <use href="#oval" style="filter: url(#blur_wheel2)" :fill="spoolWheelColor" />
                     <use href="#oval" transform="scale(0.41)" fill="#111111" />
                 </g>
-                <rect v-if="isSelected" x="0" y="314" width="258" height="186" fill="url(#spotlight)" />
+                <rect v-if="isSelected" x="0" y="260" width="258" height="186" fill="url(#spotlight)" />
 
                 <g v-if="showDetails">
                     <text
@@ -271,19 +270,10 @@ export default class MmuUnitGateSpool extends Mixins(BaseMixin, MmuMixin) {
 
     get svgClasses() {
         const classes = [this.svgClass]
-        if (this.hasSelectGateListener) classes.push('hasSelectGate')
         if (this.isSelected) classes.push('isSelected')
         if (!this.isSelected && this.unhighlightSpools) classes.push('unhighlighted')
 
         return classes
-    }
-
-    get hasSelectGateListener() {
-        return !!this.$listeners['select-gate']
-    }
-
-    selectGate() {
-        this.$emit('select-gate')
     }
 }
 </script>
@@ -291,7 +281,6 @@ export default class MmuUnitGateSpool extends Mixins(BaseMixin, MmuMixin) {
 <style scoped>
 svg {
     outline: none;
-    cursor: pointer;
     transition:
         transform 0.2s,
         opacity 0.2s;
@@ -306,7 +295,7 @@ svg.isSelected {
     opacity: 1 !important;
 }
 
-svg.hasSelectGate:hover {
+svg:hover {
     transform: translateY(-4px);
 }
 
