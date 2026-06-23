@@ -27,16 +27,18 @@ maintainable.
 
 ## Versioning & release
 
-- Version scheme: **`2.17.0-softabort.N`** (in `package.json`). Keep the same prerelease label and
-  **increment N** so the semver sorts above the previous release (Moonraker update-detection picks
-  the latest). The build stamps `release_info.json.version = "v" + package.json version`, which
-  **must equal** the git tag.
+- Version scheme: **`2.17.0-core-one.N`** (in `package.json`). Base `2.17.0` = the upstream we
+  forked from; label `core-one`; increment **N** per release. Moonraker's web updater resolves the
+  newest release via GitHub's **`latest` pointer** (NOT semver max) — confirmed live — so the
+  `latest` flag is what matters: always `gh release ... --latest`, never `--prerelease`. The build
+  stamps `release_info.json.version = "v" + package.json version`, which **must equal** the git tag.
+  (History: releases `v2.17.0-softabort.1..7` predate the label rename; `core-one` going forward.)
 - Cut a release:
   ```
-  # edit package.json version -> 2.17.0-softabort.<N>
+  # edit package.json version -> 2.17.0-core-one.<N>
   npm ci && npm run build                      # -> dist/mainsail.zip (+ release_info.json)
-  git commit -am "..." && git tag v2.17.0-softabort.<N> && git push origin <branch> --tags
-  gh release create v2.17.0-softabort.<N> --repo packerlschupfer/mainsail --latest \
+  git commit -am "..." && git tag v2.17.0-core-one.<N> && git push origin <branch> --tags
+  gh release create v2.17.0-core-one.<N> --repo packerlschupfer/mainsail --latest \
       --title "..." --notes "..." dist/mainsail.zip      # asset MUST be named mainsail.zip
   ```
 
