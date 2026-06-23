@@ -38,10 +38,16 @@ maintainable.
   ```
   # edit package.json version -> 2.17.0-core-one.<N>
   npm ci && npm run build                      # -> dist/mainsail.zip (+ release_info.json)
-  git commit -am "..." && git tag v2.17.0-core-one.<N> && git push origin <branch> --tags
-  gh release create v2.17.0-core-one.<N> --repo packerlschupfer/mainsail --latest \
-      --title "..." --notes "..." dist/mainsail.zip      # asset MUST be named mainsail.zip
+  git commit -am "..." && git tag v2.18.0-core-one.<N> && git push origin <branch> --tags
+  gh release create v2.18.0-core-one.<N> --repo packerlschupfer/mainsail --latest \
+      --title "v2.18.0-core-one.<N>" --notes "<description here>" dist/mainsail.zip
   ```
+  - asset MUST be named `mainsail.zip`.
+  - **Release title/name MUST equal the tag** (`v2.18.0-core-one.<N>`) — Moonraker's web updater
+    reads the GitHub release **name** as `remote_version` and compares it byte-for-byte to the
+    deployed `release_info.json` version. A descriptive title (e.g. `"… — merge upstream"`) makes
+    them unequal → Mainsail's Update Manager shows **UNKNOWN** (benign but wrong). Put any
+    description in `--notes` (the body), never the title.
 
 ## Deploy (Moonraker update_manager → the fork)
 
