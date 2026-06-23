@@ -27,8 +27,9 @@ maintainable.
 
 ## Versioning & release
 
-- Version scheme: **`2.17.0-core-one.N`** (in `package.json`). Base `2.17.0` = the upstream we
-  forked from; label `core-one`; increment **N** per release. Moonraker's web updater resolves the
+- Version scheme: **`<upstream-base>-core-one.N`** (in `package.json`) — currently
+  **`2.18.0-core-one.N`**. Base = the upstream minor we last merged (bump it on each upstream
+  merge, reset N to 1); label `core-one`; increment **N** per release between merges. Moonraker's web updater resolves the
   newest release via GitHub's **`latest` pointer** (NOT semver max) — confirmed live — so the
   `latest` flag is what matters: always `gh release ... --latest`, never `--prerelease`. The build
   stamps `release_info.json.version = "v" + package.json version`, which **must equal** the git tag.
