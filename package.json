@@ -1,6 +1,6 @@
 {
     "name": "mainsail",
-    "version": "2.17.0-softabort.6",
+    "version": "2.17.0-softabort.7",
     "private": true,
     "type": "module",
     "decription": "a klipper web interface",

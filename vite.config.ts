@@ -13,7 +13,10 @@ import { VitePWA, VitePWAOptions } from 'vite-plugin-pwa'
 import postcssNesting from 'postcss-nesting'
 
 const PWAConfig: Partial<VitePWAOptions> = {
-    registerType: 'autoUpdate',
+    // 'prompt' (not 'autoUpdate'): keep the old service worker serving the full old app until the
+    // user clicks "Update" (TheServiceWorker.vue dialog) -> clean reload. autoUpdate skip-waited the
+    // SW under the running page, so lazy routes (viewer/heightmap) 404'd on old chunks after a deploy.
+    registerType: 'prompt',
     includeAssets: ['fonts/**/*.woff2', 'img/**/*.svg', 'img/**/*.png'],
     manifest: {
         name: 'Mainsail',

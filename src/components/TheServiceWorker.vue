@@ -33,8 +33,13 @@ export default class TheServiceWorker extends Mixins(BaseMixin) {
         this.showDialog = true
     }
 
-    onRegistered() {
+    onRegisteredSW(swUrl: string, registration: ServiceWorkerRegistration | undefined) {
         window.console.debug('PWA is registered')
+        if (!registration) return
+
+        // poll for a deployed update so the refresh prompt appears without a manual reload
+        // (Mainsail is a long-lived SPA; without this a stale tab never learns of a new build)
+        setInterval(() => registration.update(), 60 * 1000)
     }
 
     onRegisterError(error: Error) {
@@ -52,7 +57,7 @@ export default class TheServiceWorker extends Mixins(BaseMixin) {
             immediate: true,
             onOfflineReady: this.onOfflineReady,
             onNeedRefresh: this.onNeedRefresh,
-            onRegistered: this.onRegistered,
+            onRegisteredSW: this.onRegisteredSW,
             onRegisterError: this.onRegisterError,
         })
     }
