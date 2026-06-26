@@ -102,6 +102,11 @@ export const getters: GetterTree<GuiState, RootState> = {
             allPanels = allPanels.filter((name) => name !== 'build-sheet')
         }
 
+        // remove safe-print panel, if the FW save_variable doesn't exist (printer-specific)
+        if (rootState.printer?.save_variables?.variables?.safe_print_mode === undefined) {
+            allPanels = allPanels.filter((name) => name !== 'safe-print')
+        }
+
         // remove fans panel, if no fan object exists in Klipper
         const fanTypes = ['fan_generic', 'heater_fan', 'controller_fan', 'temperature_fan']
         const existsFan = Object.keys(rootState.printer ?? {}).some(

@@ -727,6 +727,14 @@
             "MaxCap": "Max cap",
             "MinCap": "Min cap"
         },
+        "SafePrintPanel": {
+            "Headline": "Print Mode",
+            "SafeMode": "Safe Print Mode",
+            "On": "ON",
+            "Off": "OFF",
+            "HintOn": "All prints forced to step/dir + crash-detect + on-bed prime (known-good path).",
+            "HintOff": "Defaults active: phase-stepping + off-bed purge."
+        },
         "FarmPrinterPanel": {
             "ReconnectToPrinter": "Reconnect",
             "SwitchToPrinter": "Switch to Printer",

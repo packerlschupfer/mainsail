@@ -14,6 +14,7 @@ import {
     mdiLayersTriple,
     mdiLedStrip,
     mdiPrinter3dNozzle,
+    mdiShieldCheckOutline,
     mdiThermometerLines,
     mdiWebcam,
     mdiAdjust,
@@ -63,6 +64,8 @@ export default class DashboardMixin extends BaseMixin {
                 return mdiGamepad
             case 'build-sheet':
                 return mdiLayersTriple
+            case 'safe-print':
+                return mdiShieldCheckOutline
             case 'fans':
                 return mdiFan
             case 'macros':
