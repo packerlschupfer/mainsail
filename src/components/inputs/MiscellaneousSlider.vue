@@ -38,7 +38,9 @@
                             class="_slider-input pt-1"
                             @blur="onInputBlur"
                             @focus="$event.target.select()"
-                            @keydown="checkInvalidChars" />
+                            @keydown="checkInvalidChars"
+                            @keydown.up.prevent="stepInput(1)"
+                            @keydown.down.prevent="stepInput(-1)" />
                     </form>
                 </v-subheader>
                 <transition v-if="controllable && pwm" name="fade">
@@ -304,6 +306,26 @@ export default class MiscellaneousSlider extends Mixins(BaseMixin) {
         if (this.colorOrder === 'B') return 'BLUE'
 
         return 'WHITE'
+    }
+
+    // Arrow Up/Down step the % by 1 and apply live (like the slider's +/- buttons).
+    // .prevent on the keydown stops the native number-input from also stepping (double count).
+    stepInput(delta: number): void {
+        const raw = this.inputValue.toString()
+        const parsed = parseInt(raw, 10)
+        const base = raw === '' || isNaN(parsed) ? Math.round(this.value * 100) : parsed
+        let next = base + delta
+        if (next < 0) next = 0
+        if (next > 100) next = 100
+
+        this.inputValue = next
+        this.submitStep()
+    }
+
+    // coalesce held/rapid arrow presses into a single command
+    @Debounce(250)
+    submitStep(): void {
+        this.submitInput()
     }
 
     onInputBlur(): void {

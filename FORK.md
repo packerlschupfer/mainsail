@@ -28,38 +28,38 @@ maintainable.
 
 ## Versioning & release
 
-- Version scheme: **`<upstream-base>-core-one.N`** (in `package.json`) — currently
-  **`2.18.0-core-one.N`**. Base = the upstream minor we last merged (bump it on each upstream
-  merge, reset N to 1); label `core-one`; increment **N** per release between merges. Moonraker's web updater resolves the
-  newest release via GitHub's **`latest` pointer** (NOT semver max) — confirmed live — so the
-  `latest` flag is what matters: always `gh release ... --latest`, never `--prerelease`. The build
-  stamps `release_info.json.version = "v" + package.json version`, which **must equal** the git tag.
-  (History: releases `v2.17.0-softabort.1..7` predate the label rename; `core-one` going forward.)
-- Cut a release:
-  ```
-  # edit package.json version -> 2.17.0-core-one.<N>
-  npm ci && npm run build                      # -> dist/mainsail.zip (+ release_info.json)
-  git commit -am "..." && git tag v2.18.0-core-one.<N> && git push origin <branch> --tags
-  gh release create v2.18.0-core-one.<N> --repo packerlschupfer/mainsail --latest \
-      --title "v2.18.0-core-one.<N>" --notes "<description here>" dist/mainsail.zip
-  ```
-  - asset MUST be named `mainsail.zip`.
-  - **Release title/name MUST equal the tag** (`v2.18.0-core-one.<N>`) — Moonraker's web updater
-    reads the GitHub release **name** as `remote_version` and compares it byte-for-byte to the
-    deployed `release_info.json` version. A descriptive title (e.g. `"… — merge upstream"`) makes
-    them unequal → Mainsail's Update Manager shows **UNKNOWN** (benign but wrong). Put any
-    description in `--notes` (the body), never the title.
+**Policy (2026-06-28, user directive): ROLLING `v2.18.0-core-one.1`.** Keep the version string
+**fixed** at `2.18.0-core-one.1` and **force-move** the tag + release forward as work accumulates —
+do NOT increment N per feature. Bump the string ONLY when the upstream base changes (next upstream
+merge → `2.19.0-core-one.1`, etc.). Rationale: mirrors the FW firmware fork's single rolling
+`core-one.1` label. Trade-off (accepted): the Moonraker web updater compares the deployed
+`release_info.json` version string to the release **name** for *equality*, so a same-string
+force-move is NOT auto-detected — it always reads UP-TO-DATE even when stale. **Therefore deploy is
+MANUAL** (see below), not via the update button. The build still stamps
+`release_info.json.version = "v" + package.json version`, and the release **title/name MUST equal the
+tag** (`v2.18.0-core-one.1`) so that once manually deployed the badge reads UP-TO-DATE, not UNKNOWN.
+(History: `v2.17.0-softabort.1..7` predate the rename; `v2.18.0-core-one.2` (Safe Print) was folded
+back into the rolling `.1` and retired.)
 
-## Deploy (Moonraker update_manager → the fork)
+- Cut/refresh the rolling release (force-move):
+  ```
+  # package.json version STAYS 2.18.0-core-one.1
+  npm ci && npm run build                       # -> dist/mainsail.zip (+ release_info.json)
+  git commit -am "..."
+  git tag -f v2.18.0-core-one.1 && git push -f origin core-one --tags
+  gh release edit v2.18.0-core-one.1 --repo packerlschupfer/mainsail --title "v2.18.0-core-one.1"
+  gh release upload v2.18.0-core-one.1 --repo packerlschupfer/mainsail --clobber dist/mainsail.zip
+  ```
+  - asset MUST be named `mainsail.zip`; keep the release `--latest`, never `--prerelease`.
+  - title == tag (see rationale above).
 
-`[update_manager mainsail]` is configured for `repo: packerlschupfer/mainsail`, `channel: stable`,
-type `web` (Host chat owns moonraker.conf). To deploy a new release:
-```
-curl -X POST ".../machine/update/refresh?name=mainsail"   # pick up the new release
-curl -X POST ".../machine/update/client?name=mainsail"     # download+extract mainsail.zip
-```
-or click **Update** in Mainsail's Update Manager. Moonraker **refuses updates while printing**
-(503 "Klippy is printing") — deploy when idle. `rollback_version` is tracked (reversible).
+## Deploy (MANUAL — rolling-version consequence)
+
+`[update_manager mainsail]` is `type: web`, `repo: packerlschupfer/mainsail`, `channel: stable`
+(Host chat owns moonraker.conf). Because the rolling version string never changes, the web updater
+will NOT offer the update (it reads deployed == remote → UP-TO-DATE). Deploy the new `mainsail.zip`
+**manually** (operator / Host chat) — e.g. extract the release asset over the served mainsail path,
+or force a re-pull. Moonraker still **refuses updates while printing** — deploy when idle.
 
 ## Maintenance
 

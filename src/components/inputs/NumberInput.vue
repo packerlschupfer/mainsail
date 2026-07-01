@@ -18,7 +18,9 @@
             class="d-flex align-top"
             @blur="value = target.toString()"
             @focus="$event.target.select()"
-            @keydown="checkInvalidChars">
+            @keydown="checkInvalidChars"
+            @keydown.up.prevent="stepValue(1)"
+            @keydown.down.prevent="stepValue(-1)">
             <template v-if="defaultValue !== null" #append>
                 <v-icon @click="resetToDefault">{{ value !== defaultValue.toString() ? mdiRestart : '' }}</v-icon>
             </template>
@@ -51,6 +53,7 @@
 <script lang="ts">
 import Component from 'vue-class-component'
 import { Mixins, Prop, Watch } from 'vue-property-decorator'
+import { Debounce } from 'vue-debounce-decorator'
 import BaseMixin from '@/components/mixins/base'
 import { mdiChevronDown, mdiChevronUp, mdiRestart } from '@mdi/js'
 import { TranslateResult } from 'vue-i18n'
@@ -112,6 +115,24 @@ export default class NumberInput extends Mixins(BaseMixin) {
             ).toString()
         } else this.value = this.min.toString()
 
+        this.submit()
+    }
+
+    // Arrow Up/Down step the value by step*spinnerFactor and apply live (like the spinner buttons).
+    // .prevent on the keydown stops the native number-input from also stepping (double count).
+    stepValue(direction: number): void {
+        const delta = this.step * this.spinnerFactor * direction
+        let next = this.inputValue + delta
+        if (this.max !== null && next > this.max) next = this.max
+        if (next < this.min) next = this.min
+
+        this.value = (Math.round(next * 10 ** this.dec) / 10 ** this.dec).toString()
+        this.submitDebounced()
+    }
+
+    // coalesce held/rapid arrow presses into a single command
+    @Debounce(250)
+    submitDebounced(): void {
         this.submit()
     }
 
