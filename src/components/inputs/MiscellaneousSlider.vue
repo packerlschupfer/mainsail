@@ -39,6 +39,7 @@
                             @blur="onInputBlur"
                             @focus="$event.target.select()"
                             @keydown="checkInvalidChars"
+                            @keydown.tab="onInputTab"
                             @keydown.up.prevent="stepInput(1)"
                             @keydown.down.prevent="stepInput(-1)" />
                     </form>
@@ -124,6 +125,7 @@ export default class MiscellaneousSlider extends Mixins(BaseMixin) {
     private min = 0
     private inputValue = 0
     private sliderValue = 0
+    private tabCommitting = false
 
     @Prop({ type: Number, required: true })
     declare target: number
@@ -328,16 +330,22 @@ export default class MiscellaneousSlider extends Mixins(BaseMixin) {
         this.submitInput()
     }
 
+    // Commit on Tab (and Enter, via the form). Sets a flag so the blur that Tab triggers
+    // immediately afterwards does NOT reset the field back to the old value.
+    onInputTab(): void {
+        if (this.errors.length > 0) return // invalid -> let blur discard it
+        this.tabCommitting = true
+        this.submitInput()
+    }
+
     onInputBlur(): void {
-        // commit the typed value on blur (Tab / click-away), same as Enter -> submitInput.
-        // previously blur reset inputValue to the current value, silently discarding the typed
-        // number -> fan left at its last M106 (e.g. stuck at 0% for many layers mid-print).
-        if (this.errors.length > 0) {
-            this.inputValue = Math.round(this.value * 100)
+        // Tab just committed -> keep the value; the printer echo refreshes it via the watcher.
+        if (this.tabCommitting) {
+            this.tabCommitting = false
             return
         }
-
-        this.submitInput()
+        // Click-away -> discard the typed value (cancel a mistype), consistent with NumberInput.
+        this.inputValue = Math.round(this.value * 100)
     }
 
     submitInput(): void {

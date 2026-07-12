@@ -16,9 +16,10 @@
             outlined
             dense
             class="d-flex align-top"
-            @blur="value = target.toString()"
+            @blur="onBlur"
             @focus="$event.target.select()"
             @keydown="checkInvalidChars"
+            @keydown.tab="onTab"
             @keydown.up.prevent="stepValue(1)"
             @keydown.down.prevent="stepValue(-1)">
             <template v-if="defaultValue !== null" #append>
@@ -67,6 +68,7 @@ export default class NumberInput extends Mixins(BaseMixin) {
     private value: string = '0'
     private error: boolean = false
     private invalidChars: string[] = ['e', 'E', '+']
+    private tabCommitting = false
 
     // input field name and identifier
     @Prop({ required: true }) declare readonly label: TranslateResult | string
@@ -144,6 +146,24 @@ export default class NumberInput extends Mixins(BaseMixin) {
     submit(): void {
         if (this.invalidInput) return
         this.$emit('submit', { name: this.param, value: this.inputValue })
+    }
+
+    // Commit on Tab (and Enter, via the form). Sets a flag so the blur that Tab triggers
+    // immediately afterwards does NOT reset the field back to the old value.
+    onTab(): void {
+        if (this.invalidInput) return // invalid -> let blur discard it
+        this.tabCommitting = true
+        this.submit()
+    }
+
+    onBlur(): void {
+        // Tab just committed -> keep the value; the target watcher refreshes it on echo.
+        if (this.tabCommitting) {
+            this.tabCommitting = false
+            return
+        }
+        // Click-away -> discard the typed value (cancel a mistype).
+        this.value = this.target.toString()
     }
 
     // input validation //
