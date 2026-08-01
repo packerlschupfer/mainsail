@@ -41,6 +41,21 @@
                 <v-icon class="mr-md-2">{{ mdiFileUpload }}</v-icon>
                 <span class="d-none d-md-inline">{{ $t('App.TopBar.UploadPrint') }}</span>
             </v-btn>
+            <v-tooltip v-if="safePrintModeActive" bottom>
+                <template #activator="{ on, attrs }">
+                    <v-chip
+                        label
+                        color="warning"
+                        class="mr-2 font-weight-bold safe-print-badge"
+                        v-bind="attrs"
+                        v-on="on"
+                        @click="goToSafePrintPanel">
+                        <v-icon :left="$vuetify.breakpoint.mdAndUp" small>{{ mdiShieldAlertOutline }}</v-icon>
+                        <span class="d-none d-md-inline">{{ $t('App.TopBar.SafePrintMode') }}</span>
+                    </v-chip>
+                </template>
+                <span>{{ $t('App.TopBar.SafePrintModeTooltip') }}</span>
+            </v-tooltip>
             <v-btn
                 v-if="showSoftAbortButton"
                 tile
@@ -105,6 +120,7 @@ import {
     mdiFileUpload,
     mdiClose,
     mdiCloseThick,
+    mdiShieldAlertOutline,
     mdiStopCircleOutline,
 } from '@mdi/js'
 import EmergencyStopDialog from '@/components/dialogs/EmergencyStopDialog.vue'
@@ -138,6 +154,7 @@ export default class TheTopbar extends Mixins(BaseMixin, ThemeMixin) {
     mdiFileUpload = mdiFileUpload
     mdiClose = mdiClose
     mdiCloseThick = mdiCloseThick
+    mdiShieldAlertOutline = mdiShieldAlertOutline
     mdiStopCircleOutline = mdiStopCircleOutline
 
     topbarHeight = topbarHeight
@@ -233,6 +250,16 @@ export default class TheTopbar extends Mixins(BaseMixin, ThemeMixin) {
         // a blocking heat/soak/mesh wait (the thing this interrupts) can occur in standby too
         // (e.g. a manual M190 from the console), so it must not be gated to printing/paused.
         return this.klippyIsConnected
+    }
+
+    // Persisted FW flag (save_variables) that silently forces prints onto the legacy step/dir path.
+    // Surface it in the always-visible topbar so it can't be missed (the dashboard panel wasn't enough).
+    get safePrintModeActive(): boolean {
+        return Number(this.$store.state.printer?.save_variables?.variables?.safe_print_mode ?? 0) === 1
+    }
+
+    goToSafePrintPanel(): void {
+        if (this.$route.path !== '/') this.$router.push('/').catch(() => {})
     }
 
     get defaultNavigationStateSetting() {

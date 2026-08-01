@@ -85,6 +85,8 @@
             "CannotUploadTheFile": "Cannot upload the file!",
             "EmergencyStop": "Emergency Stop",
             "SAVE_CONFIG": "SAVE CONFIG",
+            "SafePrintMode": "Safe Print Mode",
+            "SafePrintModeTooltip": "Safe Print Mode is ON — every print is forced onto the legacy step/dir path (PHASE_STEP=0 OFFBED=0), overriding defaults. Click to open the Print Mode panel.",
             "SoftAbort": "Soft Abort",
             "Uploading": "Uploading",
             "UploadOfFileSuccessful": "Upload of {file} successful!",
