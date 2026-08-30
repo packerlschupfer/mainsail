@@ -85,7 +85,8 @@
             "CannotUploadTheFile": "Cannot upload the file!",
             "EmergencyStop": "Emergency Stop",
             "FilamentMaterial": "Material not set",
-            "FilamentMaterialTooltip": "The printer does not know which filament material is loaded, so the next print will abort once. Click to open the Filament Material panel and set it.",
+            "FilamentMaterialEmptyTooltip": "The printer has no filament material recorded. A print will adopt the material from the G-code. Click to set it explicitly.",
+            "FilamentMaterialSwapTooltip": "Filament was removed and the printer wasn't told what replaced it, so a print will refuse to start. Click to open the Filament Material panel and set it.",
             "SafePrintMode": "Safe Print Mode",
             "SafePrintModeTooltip": "Safe Print Mode is ON — every print is forced onto the legacy step/dir path (PHASE_STEP=0 OFFBED=0), overriding defaults. Click to open the Print Mode panel.",
             "SAVE_CONFIG": "SAVE CONFIG",
@@ -738,7 +739,7 @@
         },
         "FilamentMaterialPanel": {
             "Abrasive": "abrasive",
-            "AwaitingHint": "The printer does not know which material is loaded. Pick it below, or the next print will abort once.",
+            "AwaitingSwapHint": "Filament was removed and the printer wasn't told what replaced it. A print will refuse to start until you pick the material.",
             "Bed": "Bed",
             "Change": "Change filament",
             "Clear": "Forget material",
@@ -747,6 +748,9 @@
             "Load": "Load",
             "Loaded": "Loaded",
             "LoadHint": "Load and Change use the selected material's temperature and purge rate.",
+            "NoProfile": "NO PROFILE",
+            "NoProfileHint": "No profile for {name}: its temperatures and purge rate aren't known, so fallback values are used. Add a [filaments {name}] section or set them with M865.",
+            "NothingRecordedHint": "No material recorded. A print will adopt the material from the G-code — pick it here to be explicit.",
             "Nozzle": "Nozzle",
             "Unknown": "NOT SET",
             "Unload": "Unload"

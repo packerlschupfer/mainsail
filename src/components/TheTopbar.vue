@@ -69,7 +69,7 @@
                         <span class="d-none d-md-inline">{{ $t('App.TopBar.FilamentMaterial') }}</span>
                     </v-chip>
                 </template>
-                <span>{{ $t('App.TopBar.FilamentMaterialTooltip') }}</span>
+                <span>{{ $t(filamentBadgeTooltipKey) }}</span>
             </v-tooltip>
             <v-btn
                 v-if="showSoftAbortButton"
@@ -279,13 +279,31 @@ export default class TheTopbar extends Mixins(BaseMixin, ThemeMixin) {
         if (this.$route.path !== '/') this.$router.push('/').catch(() => {})
     }
 
-    // The FW's [filaments] extra aborts the next print ONCE when it doesn't know the loaded
-    // material. Without a topbar cue that reads purely as "my print won't start", so surface it
-    // the same way as the safe-print flag rather than only inside the panel.
-    get filamentMaterialUnknown(): boolean {
+    // NOTE: `known` from [filaments] means "parameters/preset available", NOT "we know what's
+    // loaded" — it is false both for an empty tool AND for a recorded-but-unrecognised name
+    // (e.g. PEI-1010-CF). Keying the badge on `!known` made it read "material not set" next to
+    // the material's own name. The real nothing-recorded test is the FW's `---` sentinel.
+    get filamentNothingRecorded(): boolean {
         const filaments = this.$store.state.printer?.filaments
         if (!filaments) return false
-        return filaments.awaiting_material === true || filaments.known === false
+        const loaded = filaments.loaded?.[filaments.active_tool ?? 0] ?? filaments.name ?? ''
+        return loaded === '---' || loaded === ''
+    }
+
+    // Filament physically removed and nobody said what replaced it — the only state that
+    // actually makes a print refuse to start (FILAMENT_CHECK adopts when nothing is recorded).
+    get filamentAwaitingSwap(): boolean {
+        return this.$store.state.printer?.filaments?.awaiting_material === true
+    }
+
+    get filamentMaterialUnknown(): boolean {
+        return this.filamentAwaitingSwap || this.filamentNothingRecorded
+    }
+
+    get filamentBadgeTooltipKey(): string {
+        return this.filamentAwaitingSwap
+            ? 'App.TopBar.FilamentMaterialSwapTooltip'
+            : 'App.TopBar.FilamentMaterialEmptyTooltip'
     }
 
     goToFilamentMaterialPanel(): void {

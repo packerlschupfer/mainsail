@@ -6,8 +6,14 @@
         :collapsible="true"
         card-class="filament-material-panel">
         <v-card-text>
-            <v-alert v-if="awaitingMaterial" dense text type="warning" class="mb-3 py-2">
-                {{ $t('Panels.FilamentMaterialPanel.AwaitingHint') }}
+            <v-alert v-if="awaitingSwap" dense text type="warning" class="mb-3 py-2">
+                {{ $t('Panels.FilamentMaterialPanel.AwaitingSwapHint') }}
+            </v-alert>
+            <v-alert v-else-if="nothingRecorded" dense text type="info" class="mb-3 py-2">
+                {{ $t('Panels.FilamentMaterialPanel.NothingRecordedHint') }}
+            </v-alert>
+            <v-alert v-else-if="noProfile" dense text type="info" class="mb-3 py-2">
+                {{ $t('Panels.FilamentMaterialPanel.NoProfileHint', { name: loaded }) }}
             </v-alert>
             <div class="mb-1">
                 <v-btn
@@ -27,19 +33,27 @@
                 <div class="flex-grow-1">
                     <div class="d-flex align-center">
                         <span class="text--secondary">{{ $t('Panels.FilamentMaterialPanel.Loaded') }}:</span>
-                        <strong class="ml-1">{{ loaded || '—' }}</strong>
-                        <v-chip v-if="awaitingMaterial" x-small label color="warning" class="ml-2">
+                        <strong class="ml-1">{{ nothingRecorded ? '—' : loaded }}</strong>
+                        <v-chip v-if="nothingRecorded" x-small label color="warning" class="ml-2">
                             {{ $t('Panels.FilamentMaterialPanel.Unknown') }}
                         </v-chip>
+                        <v-chip v-else-if="noProfile" x-small label class="ml-2">
+                            {{ $t('Panels.FilamentMaterialPanel.NoProfile') }}
+                        </v-chip>
                     </div>
-                    <span v-if="known" class="text--secondary caption">
+                    <span v-if="hasProfile" class="text--secondary caption">
                         {{ $t('Panels.FilamentMaterialPanel.Nozzle') }} {{ nozzle }}°C ·
                         {{ $t('Panels.FilamentMaterialPanel.Bed') }} {{ bed }}°C
                         <template v-if="isFlexible">· {{ $t('Panels.FilamentMaterialPanel.Flexible') }}</template>
                         <template v-if="abrasive">· {{ $t('Panels.FilamentMaterialPanel.Abrasive') }}</template>
                     </span>
                 </div>
-                <v-btn small text :disabled="!known" :loading="loadings.includes('filamentClear')" @click="clear">
+                <v-btn
+                    small
+                    text
+                    :disabled="nothingRecorded"
+                    :loading="loadings.includes('filamentClear')"
+                    @click="clear">
                     <v-icon small class="mr-1">{{ mdiBackspaceOutline }}</v-icon>
                     {{ $t('Panels.FilamentMaterialPanel.Clear') }}
                 </v-btn>
@@ -85,6 +99,9 @@ import BaseMixin from '@/components/mixins/base'
 import Panel from '@/components/ui/Panel.vue'
 import { mdiAdjust, mdiBackspaceOutline } from '@mdi/js'
 
+// FW sentinel for "no material recorded for this tool" ([filaments], filaments.py).
+const NO_MATERIAL = '---'
+
 @Component({
     components: { Panel },
 })
@@ -93,7 +110,7 @@ export default class FilamentMaterialPanel extends Mixins(BaseMixin) {
     mdiBackspaceOutline = mdiBackspaceOutline
 
     // status from the [filaments] klipper extra (FW-owned). data-driven off `available`,
-    // so the material list follows the FW's preset table and never needs a UI change.
+    // so the material list follows the FW preset table and never needs a UI change.
     get filaments() {
         return this.$store.state.printer?.filaments ?? {}
     }
@@ -113,14 +130,38 @@ export default class FilamentMaterialPanel extends Mixins(BaseMixin) {
         return this.filaments.active_tool ?? 0
     }
 
-    get known(): boolean {
+    // THE THREE FW FLAGS ARE NOT INTERCHANGEABLE — see the state table below. Getting this
+    // wrong shipped a badge that read "material not set" next to the material's own name.
+    //
+    //   name/loaded    known  awaiting_material   meaning
+    //   PLA            true   false               resolved preset, params available
+    //   PETG-CF        true   false               prefix-resolved to PETG, params available
+    //   PEI-1010-CF    FALSE  false               recorded by name, NO preset -> no params
+    //   ---            false  false               nothing recorded; PRINT_START adopts the gcode's material
+    //   ---            false  true                filament removed, not told what replaced it -> print refuses
+    //
+    // So `known` means "do we have PARAMETERS", NOT "do we know what's loaded", and the real
+    // "nothing recorded" test is the `---` sentinel.
+    get nothingRecorded(): boolean {
+        const loaded = this.loaded
+        return loaded === NO_MATERIAL || loaded === ''
+    }
+
+    // Filament was physically removed and nobody said what replaced it. This is the only
+    // state that makes a print refuse to start, so it's the one that warrants a warning.
+    get awaitingSwap(): boolean {
+        return this.filaments.awaiting_material === true
+    }
+
+    // Parameters (temps, purge rate) are available for the recorded material.
+    get hasProfile(): boolean {
         return this.filaments.known === true
     }
 
-    // The FW aborts the next print ONCE when it does not know the material. Surfacing it
-    // here (and in the topbar) is the whole point: otherwise it reads as "print won't start".
-    get awaitingMaterial(): boolean {
-        return this.filaments.awaiting_material === true || this.filaments.known === false
+    // A material IS recorded, but its name matches no preset — so it runs on fallback
+    // numbers. Worth saying, but it is NOT "material not set".
+    get noProfile(): boolean {
+        return !this.hasProfile && !this.nothingRecorded
     }
 
     get nozzle(): number {
@@ -145,7 +186,7 @@ export default class FilamentMaterialPanel extends Mixins(BaseMixin) {
     }
 
     selectMaterial(name: string): void {
-        if (name === this.loaded && this.known) return
+        if (name === this.loaded) return
         this.sendGcode(`SET_FILAMENT TYPE=${name}`, 'filamentSet' + name)
     }
 
@@ -157,7 +198,7 @@ export default class FilamentMaterialPanel extends Mixins(BaseMixin) {
     // purge runs at the incoming material's numbers (the BFW-9003 fix). Omitting it would
     // purge a material change at the OUTGOING material's rate.
     load(): void {
-        const type = this.loaded
+        const type = this.nothingRecorded ? '' : this.loaded
         this.sendGcode(type ? `LOAD_FILAMENT TYPE=${type}` : 'LOAD_FILAMENT', 'filamentLoad')
     }
 
@@ -166,7 +207,7 @@ export default class FilamentMaterialPanel extends Mixins(BaseMixin) {
     }
 
     changeFilament(): void {
-        const type = this.loaded
+        const type = this.nothingRecorded ? '' : this.loaded
         this.sendGcode(type ? `M600 TYPE=${type}` : 'M600', 'filamentM600')
     }
 }
