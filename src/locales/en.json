@@ -84,9 +84,11 @@
         "TopBar": {
             "CannotUploadTheFile": "Cannot upload the file!",
             "EmergencyStop": "Emergency Stop",
-            "SAVE_CONFIG": "SAVE CONFIG",
+            "FilamentMaterial": "Material not set",
+            "FilamentMaterialTooltip": "The printer does not know which filament material is loaded, so the next print will abort once. Click to open the Filament Material panel and set it.",
             "SafePrintMode": "Safe Print Mode",
             "SafePrintModeTooltip": "Safe Print Mode is ON — every print is forced onto the legacy step/dir path (PHASE_STEP=0 OFFBED=0), overriding defaults. Click to open the Print Mode panel.",
+            "SAVE_CONFIG": "SAVE CONFIG",
             "SoftAbort": "Soft Abort",
             "Uploading": "Uploading",
             "UploadOfFileSuccessful": "Upload of {file} successful!",
@@ -729,18 +731,25 @@
             "MaxCap": "Max cap",
             "MinCap": "Min cap"
         },
-        "SafePrintPanel": {
-            "Headline": "Print Mode",
-            "SafeMode": "Safe Print Mode",
-            "On": "ON",
-            "Off": "OFF",
-            "HintOn": "All prints forced to step/dir + crash-detect + on-bed prime (known-good path).",
-            "HintOff": "Defaults active: phase-stepping + off-bed purge."
-        },
         "FarmPrinterPanel": {
             "ReconnectToPrinter": "Reconnect",
             "SwitchToPrinter": "Switch to Printer",
             "WebcamOff": "Off"
+        },
+        "FilamentMaterialPanel": {
+            "Abrasive": "abrasive",
+            "AwaitingHint": "The printer does not know which material is loaded. Pick it below, or the next print will abort once.",
+            "Bed": "Bed",
+            "Change": "Change filament",
+            "Clear": "Forget material",
+            "Flexible": "flexible",
+            "Headline": "Filament Material",
+            "Load": "Load",
+            "Loaded": "Loaded",
+            "LoadHint": "Load and Change use the selected material's temperature and purge rate.",
+            "Nozzle": "Nozzle",
+            "Unknown": "NOT SET",
+            "Unload": "Unload"
         },
         "KlippyStatePanel": {
             "CheckKlippyAndUdsAddress": "Please check if the Klipper service is running and klippy_uds_address is correctly configured in the moonraker.conf.",
@@ -970,6 +979,14 @@
                 "ToolNotUsed": "{tool} not used in this print, choose default mapping"
             },
             "Unknown": "Unknown"
+        },
+        "SafePrintPanel": {
+            "Headline": "Print Mode",
+            "HintOff": "Defaults active: phase-stepping + off-bed purge.",
+            "HintOn": "All prints forced to step/dir + crash-detect + on-bed prime (known-good path).",
+            "Off": "OFF",
+            "On": "ON",
+            "SafeMode": "Safe Print Mode"
         },
         "SpoolmanPanel": {
             "ActiveSpool": "Active Spool",

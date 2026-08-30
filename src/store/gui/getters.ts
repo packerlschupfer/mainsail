@@ -102,6 +102,11 @@ export const getters: GetterTree<GuiState, RootState> = {
             allPanels = allPanels.filter((name) => name !== 'build-sheet')
         }
 
+        // remove filament-material panel, if no [filaments] object exists in Klipper
+        if (!rootState.printer?.filaments) {
+            allPanels = allPanels.filter((name) => name !== 'filament-material')
+        }
+
         // remove safe-print panel, if the FW save_variable doesn't exist (printer-specific)
         if (rootState.printer?.save_variables?.variables?.safe_print_mode === undefined) {
             allPanels = allPanels.filter((name) => name !== 'safe-print')

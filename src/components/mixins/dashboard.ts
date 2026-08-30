@@ -66,6 +66,8 @@ export default class DashboardMixin extends BaseMixin {
                 return mdiLayersTriple
             case 'safe-print':
                 return mdiShieldCheckOutline
+            case 'filament-material':
+                return mdiAdjust
             case 'fans':
                 return mdiFan
             case 'macros':

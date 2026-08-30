@@ -113,6 +113,7 @@ export const allDashboardPanels = [
     'toolhead-control',
     'build-sheet',
     'safe-print',
+    'filament-material',
     'fans',
     'extruder-control',
     'macros',

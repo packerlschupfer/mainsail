@@ -56,6 +56,21 @@
                 </template>
                 <span>{{ $t('App.TopBar.SafePrintModeTooltip') }}</span>
             </v-tooltip>
+            <v-tooltip v-if="filamentMaterialUnknown" bottom>
+                <template #activator="{ on, attrs }">
+                    <v-chip
+                        label
+                        color="warning"
+                        class="mr-2 font-weight-bold filament-material-badge"
+                        v-bind="attrs"
+                        v-on="on"
+                        @click="goToFilamentMaterialPanel">
+                        <v-icon :left="$vuetify.breakpoint.mdAndUp" small>{{ mdiAlertCircleOutline }}</v-icon>
+                        <span class="d-none d-md-inline">{{ $t('App.TopBar.FilamentMaterial') }}</span>
+                    </v-chip>
+                </template>
+                <span>{{ $t('App.TopBar.FilamentMaterialTooltip') }}</span>
+            </v-tooltip>
             <v-btn
                 v-if="showSoftAbortButton"
                 tile
@@ -121,6 +136,7 @@ import {
     mdiClose,
     mdiCloseThick,
     mdiShieldAlertOutline,
+    mdiAlertCircleOutline,
     mdiStopCircleOutline,
 } from '@mdi/js'
 import EmergencyStopDialog from '@/components/dialogs/EmergencyStopDialog.vue'
@@ -155,6 +171,7 @@ export default class TheTopbar extends Mixins(BaseMixin, ThemeMixin) {
     mdiClose = mdiClose
     mdiCloseThick = mdiCloseThick
     mdiShieldAlertOutline = mdiShieldAlertOutline
+    mdiAlertCircleOutline = mdiAlertCircleOutline
     mdiStopCircleOutline = mdiStopCircleOutline
 
     topbarHeight = topbarHeight
@@ -259,6 +276,19 @@ export default class TheTopbar extends Mixins(BaseMixin, ThemeMixin) {
     }
 
     goToSafePrintPanel(): void {
+        if (this.$route.path !== '/') this.$router.push('/').catch(() => {})
+    }
+
+    // The FW's [filaments] extra aborts the next print ONCE when it doesn't know the loaded
+    // material. Without a topbar cue that reads purely as "my print won't start", so surface it
+    // the same way as the safe-print flag rather than only inside the panel.
+    get filamentMaterialUnknown(): boolean {
+        const filaments = this.$store.state.printer?.filaments
+        if (!filaments) return false
+        return filaments.awaiting_material === true || filaments.known === false
+    }
+
+    goToFilamentMaterialPanel(): void {
         if (this.$route.path !== '/') this.$router.push('/').catch(() => {})
     }
 
