@@ -13,12 +13,14 @@
 # Maintainers can vouch via issue/PR comments: "vouch", "vouch @user",
 # or denounce via "denounce" / "denounce @user".
 bigtreetech
+hannott
 jimmyjon711 Maintainer from AFC
 jomik
 julianschill LED effects Maintainer
 jwueller
 moggieuk Maintainer from Happy Hare
 mspi92
+neko-vecter
 pataar
 paxx12 Maintainer from Snapmaker community firmware
 ragilo
